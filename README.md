@@ -10,6 +10,19 @@ This repository contains:
 
 -----
 
+# How to Run the Code
+
+To run the code provided in metacircular-evaluator.scm, follow these steps:
+
++ Install the ``DrRacket`` IDE, if not already installed.
++ Open ``DrRacket`` and go to the menu: ``File → Install Package``.
++ Search for and install the ``sicp`` language package.
++ Load the ``metacircular-evaluator.scm`` file into DrRacket and execute the code by pressing the ``Run`` button.
+
+The ``sicp`` language package adds necessary Scheme functionalities, specifically related to SICP (Structure and Interpretation of Computer Programs). Features like ``set-car!`` and ``set-cdr!``, which are used to modify pairs in the ``sicp`` language, require this package for full compatibility.
+
+-----
+
 # Bibliography
 
 - Harold Abelson e Gerald Jay Sussman. Structure and Interpretation of Computer Programs. 2nd. Cambridge, MA: MIT Press, 1996. isbn: 978-0262510875. (Online Version)[https://mitpress.mit.edu/sites/default/files/sicp/index.html].
