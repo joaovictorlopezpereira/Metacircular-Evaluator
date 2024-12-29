@@ -27,6 +27,6 @@ The ``sicp`` language package adds necessary Scheme functionalities, specificall
 
 - Harold Abelson e Gerald Jay Sussman. Structure and Interpretation of Computer Programs. 2nd. Cambridge, MA: MIT Press, 1996. isbn: 978-0262510875. (Online Version)[https://mitpress.mit.edu/sites/default/files/sicp/index.html].
 
-- Gerald Jay Sussman. Lecture 7A: Metacircular Evaluator, Part 1. Accessed on 2024-12-24. (Watch on YouTube)[https://youtu.be/aAlR3cezPJg?si=i4y2_VHeh16LAx6V&t].
+- Gerald Jay Sussman. Lecture 7A: Metacircular Evaluator, Part 1. Accessed on 2024-12-24. (Watch on YouTube)[https://youtu.be/aAlR3cezPJg].
 
-- Gerald Jay Sussman. Lecture 7B: Metacircular Evaluator, Part 2. Accessed on 2024-12-24. (Watch on YouTube)[https://youtu.be/QVEOq5k6Xi0?si=z_Mkb5oqF-BJo7Lp&t].
+- Gerald Jay Sussman. Lecture 7B: Metacircular Evaluator, Part 2. Accessed on 2024-12-24. (Watch on YouTube)[https://youtu.be/QVEOq5k6Xi0].
