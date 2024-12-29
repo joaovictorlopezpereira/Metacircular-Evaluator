@@ -1,4 +1,5 @@
-#lang sicp
+#lang scheme
+(require sicp)
 
 ; === EVAL and APPLY === ;
 (define (EVAL exp env)
@@ -38,7 +39,7 @@
       (eq? (car exp) tag)
       false))
 
-(define self-value?              number?)
+(define (self-value? exp)        (or (number? exp) (string? exp)))
 (define variable?                symbol?)
 (define (quoted? exp)            (tagged-list? exp 'quote))
 (define (assignment? exp)        (tagged-list? exp 'set!))
@@ -278,6 +279,7 @@
         (list '+ +)
         (list '* *)
         (list '- -)
+        (list '/ /)
         (list '< <)
         (list '> >)
         (list '= =)
@@ -320,4 +322,112 @@
       (display object)))
 ; === Driver Loop === ;
 
-(driver-loop)
+; === Tests === ;
+(define tests '())
+
+(define test-environment (setup-environment))
+
+(define (add-test test solution success-msg failure-msg)
+  (set! tests (append tests 
+                      (list (lambda () 
+                              (display (if (equal? (EVAL test test-environment) solution) 
+                                           success-msg 
+                                           failure-msg)))))))
+
+(define (run-tests)
+  (define (run-tests-helper test-list)
+    (if (null? test-list)
+        "all tests done!"
+        (begin
+          ((car test-list))
+          (newline)
+          (run-tests-helper (cdr test-list)))))
+  (run-tests-helper tests))
+
+(add-test '(car '(1 2 3)) 1 
+          "Test for 'car' passed."
+          "Test for 'car' failed.")
+
+(add-test '(cdr '(1 2 3)) '(2 3) 
+          "Test for 'cdr' passed."
+          "Test for 'cdr' failed.")
+
+(add-test '(cons 1 '(2 3)) '(1 2 3) 
+          "Test for 'cons' passed."
+          "Test for 'cons' failed.")
+
+(add-test '(null? '()) #t 
+          "Test for 'null?' passed."
+          "Test for 'null?' failed.")
+
+(add-test '(+ 2 3) 5 
+          "Test for '+' passed."
+          "Test for '+' failed.")
+
+(add-test '(* 3 4) 12 
+          "Test for '*' passed."
+          "Test for '*' failed.")
+
+(add-test '(- 10 4) 6 
+          "Test for '-' passed."
+          "Test for '-' failed.")
+
+(add-test '(/ 20 4) 5 
+          "Test for '/' passed."
+          "Test for '/' failed.")
+
+(add-test '(< 2 5) #t 
+          "Test for '<' passed."
+          "Test for '<' failed.")
+
+(add-test '(> 10 3) #t 
+          "Test for '>' passed."
+          "Test for '>' failed.")
+
+(add-test '(= 4 4) #t 
+          "Test for '=' passed."
+          "Test for '=' failed.")
+
+(add-test '(let ((x 10) (y 3)) (+ x y 2)) 15
+          "Test for 'let' passed."
+          "Test for 'let' failed.")
+
+(add-test '(if (< 2 3) "true branch" "false branch") "true branch"
+          "Test for 'if' passed."
+          "Test for 'if' failed.")
+
+(add-test '(begin (define x 42) x) 42
+          "Test for 'define' passed."
+          "Test for 'define' failed.")
+
+(add-test '((lambda (a b) (* a b)) 4 5) 20
+          "Test for 'lambda' passed."
+          "Test for 'lambda' failed.")
+
+(add-test '(begin (define (square x) (* x x)) (square 6)) 36
+          "Test for 'define' passed."
+          "Test for 'define' failed.")
+
+(add-test '(begin 
+              (define (factorial n)
+                (if (= n 0)
+                    1
+                    (* n (factorial (- n 1)))))
+              (factorial 5)) 120
+          "Test for 'recursion' passed."
+          "Test for 'recursion' failed.")
+
+(add-test '(cond ((< 2 1) "branch 1")
+                 ((= 2 2) "branch 2")
+                 (else "default")) "branch 2"
+          "Test for 'cond' passed."
+          "Test for 'cond' failed.")
+
+(add-test '(quote (a b c)) '(a b c)
+          "Test for 'quote' passed."
+          "Test for 'quote' failed.")
+; === Tests === ;
+
+; uncomment which one you desire to run
+;(run-tests)
+;(driver-loop)
