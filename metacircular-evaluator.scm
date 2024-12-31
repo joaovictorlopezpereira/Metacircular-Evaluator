@@ -69,8 +69,6 @@
 (define rest-exps                cdr)
 (define operator                 car)
 (define operands                 cdr)
-(define first-operand            car)
-(define rest-operands            cdr)
 (define cond-clauses             cdr)
 (define cond-predicate           car)
 (define cond-actions             cdr)
@@ -308,10 +306,12 @@
   (newline)
   (display ">> ")
   (let ((input (read)))
-    (let ((output (EVAL input the-global-environment)))
-      (display "")
-      (user-print output)))
-  (driver-loop))
+    (if (eq? input 'run-tests!!)
+        (run-tests)
+        (let ((output (EVAL input the-global-environment)))
+          (display "")
+          (user-print output)))
+    (driver-loop)))
 
 (define (user-print object)
   (if (compound-procedure? object)
@@ -324,16 +324,13 @@
 
 ; === Tests === ;
 (define tests '())
-
 (define test-environment (setup-environment))
-
 (define (add-test test solution success-msg failure-msg)
   (set! tests (append tests 
                       (list (lambda () 
                               (display (if (equal? (EVAL test test-environment) solution) 
                                            success-msg 
                                            failure-msg)))))))
-
 (define (run-tests)
   (define (run-tests-helper test-list)
     (if (null? test-list)
@@ -343,7 +340,7 @@
           (newline)
           (run-tests-helper (cdr test-list)))))
   (run-tests-helper tests))
-
+      
 (add-test '(car '(1 2 3)) 1 
           "Test for 'car' passed."
           "Test for 'car' failed.")
@@ -409,25 +406,23 @@
           "Test for 'define' failed.")
 
 (add-test '(begin 
-              (define (factorial n)
-                (if (= n 0)
-                    1
-                    (* n (factorial (- n 1)))))
-              (factorial 5)) 120
-          "Test for 'recursion' passed."
-          "Test for 'recursion' failed.")
+             (define (factorial n)
+               (if (= n 0)
+                   1
+                   (* n (factorial (- n 1)))))
+             (factorial 5)) 120
+                            "Test for 'recursion' passed."
+                            "Test for 'recursion' failed.")
 
 (add-test '(cond ((< 2 1) "branch 1")
                  ((= 2 2) "branch 2")
                  (else "default")) "branch 2"
-          "Test for 'cond' passed."
-          "Test for 'cond' failed.")
+                                   "Test for 'cond' passed."
+                                   "Test for 'cond' failed.")
 
 (add-test '(quote (a b c)) '(a b c)
           "Test for 'quote' passed."
           "Test for 'quote' failed.")
 ; === Tests === ;
 
-; uncomment which one you desire to run
-;(run-tests)
 (driver-loop)
