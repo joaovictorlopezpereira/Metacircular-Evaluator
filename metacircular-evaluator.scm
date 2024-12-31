@@ -430,4 +430,4 @@
 
 ; uncomment which one you desire to run
 ;(run-tests)
-;(driver-loop)
+(driver-loop)
