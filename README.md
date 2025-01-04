@@ -19,7 +19,7 @@ To run the code provided in metacircular-evaluator.scm, follow these steps:
 + Search for and install the ``sicp`` language package.
 + Load the ``metacircular-evaluator.scm`` file into DrRacket and execute the code by pressing the ``Run`` button.
 
-Instead following the last step, once ``DrRacket`` and ``sicp`` are installed, the code can be run by running
+Instead of following the last step, once ``DrRacket`` and ``sicp`` are installed, the code can be run by running
 
 ```bash 
 racket metacircular-evaluator.scm
