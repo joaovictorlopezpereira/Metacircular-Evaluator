@@ -49,3 +49,5 @@ Observe the output as the tests are executed. The results will indicate which te
 - Gerald Jay Sussman. Lecture 7A: Metacircular Evaluator, Part 1. Accessed on 2024-12-24. [Watch on YouTube](https://youtu.be/aAlR3cezPJg).
 
 - Gerald Jay Sussman. Lecture 7B: Metacircular Evaluator, Part 2. Accessed on 2024-12-24. [Watch on YouTube](https://youtu.be/QVEOq5k6Xi0).
+
+Any additional bibliography may be cited at the ``report.pdf`` file.
