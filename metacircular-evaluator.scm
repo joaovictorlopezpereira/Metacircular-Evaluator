@@ -3,6 +3,7 @@
 
 ; === EVAL and APPLY === ;
 (define (EVAL exp env)
+  ; (display "eval ") (display exp) (newline)
   (cond
     ((self-value? exp)  exp)
     ((variable? exp)    (lookup-variable-value exp env))
@@ -22,6 +23,7 @@
     (else (error "Unknown expression type! --- EVAL" exp))))
 
 (define (APPLY procedure arguments)
+  ; (display "apply ") (display procedure) (display arguments) (newline)
   (cond
     ((primitive-procedure? procedure)
      (apply-primitive-procedure procedure arguments))
@@ -84,6 +86,7 @@
 
 ; === Evaluation === ;
 (define (lookup-variable-value var env)
+  ; (display "lookup-variable-value ") (display var) (newline)
   (define (env-loop env)
     (define (scan vars vals)
       (cond ((null? vars)
@@ -326,10 +329,10 @@
 (define tests '())
 (define test-environment (setup-environment))
 (define (add-test test solution success-msg failure-msg)
-  (set! tests (append tests 
-                      (list (lambda () 
-                              (display (if (equal? (EVAL test test-environment) solution) 
-                                           success-msg 
+  (set! tests (append tests
+                      (list (lambda ()
+                              (display (if (equal? (EVAL test test-environment) solution)
+                                           success-msg
                                            failure-msg)))))))
 (define (run-tests)
   (define (run-tests-helper test-list)
@@ -340,48 +343,48 @@
           (newline)
           (run-tests-helper (cdr test-list)))))
   (run-tests-helper tests))
-      
-(add-test '(car '(1 2 3)) 1 
+
+(add-test '(car '(1 2 3)) 1
           "Test for 'car' passed."
           "Test for 'car' failed.")
 
-(add-test '(cdr '(1 2 3)) '(2 3) 
+(add-test '(cdr '(1 2 3)) '(2 3)
           "Test for 'cdr' passed."
           "Test for 'cdr' failed.")
 
-(add-test '(cons 1 '(2 3)) '(1 2 3) 
+(add-test '(cons 1 '(2 3)) '(1 2 3)
           "Test for 'cons' passed."
           "Test for 'cons' failed.")
 
-(add-test '(null? '()) #t 
+(add-test '(null? '()) #t
           "Test for 'null?' passed."
           "Test for 'null?' failed.")
 
-(add-test '(+ 2 3) 5 
+(add-test '(+ 2 3) 5
           "Test for '+' passed."
           "Test for '+' failed.")
 
-(add-test '(* 3 4) 12 
+(add-test '(* 3 4) 12
           "Test for '*' passed."
           "Test for '*' failed.")
 
-(add-test '(- 10 4) 6 
+(add-test '(- 10 4) 6
           "Test for '-' passed."
           "Test for '-' failed.")
 
-(add-test '(/ 20 4) 5 
+(add-test '(/ 20 4) 5
           "Test for '/' passed."
           "Test for '/' failed.")
 
-(add-test '(< 2 5) #t 
+(add-test '(< 2 5) #t
           "Test for '<' passed."
           "Test for '<' failed.")
 
-(add-test '(> 10 3) #t 
+(add-test '(> 10 3) #t
           "Test for '>' passed."
           "Test for '>' failed.")
 
-(add-test '(= 4 4) #t 
+(add-test '(= 4 4) #t
           "Test for '=' passed."
           "Test for '=' failed.")
 
@@ -405,7 +408,7 @@
           "Test for 'define' passed."
           "Test for 'define' failed.")
 
-(add-test '(begin 
+(add-test '(begin
              (define (factorial n)
                (if (= n 0)
                    1
