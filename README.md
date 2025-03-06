@@ -12,7 +12,7 @@ This repository contains:
 
 # How to Run the Code
 
-To run the code provided in metacircular-evaluator.scm, follow these steps:
+To run the code provided in ``metacircular-evaluator.scm``, follow these steps:
 
 + Install the ``DrRacket`` IDE, if not already installed.
 + Open ``DrRacket`` and go to the menu: ``File → Install Package``.
@@ -21,7 +21,7 @@ To run the code provided in metacircular-evaluator.scm, follow these steps:
 
 Instead of following the last step, once ``DrRacket`` and ``sicp`` are installed, the code can be run by running
 
-```bash 
+```bash
 racket metacircular-evaluator.scm
 ```
 
