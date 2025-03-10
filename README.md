@@ -12,7 +12,7 @@ This repository contains:
 
 -----
 
-# How to Run the Code
+## How to Run the Code
 
 To run the code provided in ``metacircular-evaluator.scm``, follow these steps:
 
@@ -33,7 +33,7 @@ The ``sicp`` language package adds necessary Scheme functionalities, specificall
 
 -----
 
-# How to Run the Tests
+## How to Run the Tests
 
 To execute the test suite for the evaluator, follow these steps:
 
@@ -44,7 +44,7 @@ Observe the output as the tests are executed. The results will indicate which te
 
 -----
 
-# Bibliography
+## Bibliography
 
 - Harold Abelson e Gerald Jay Sussman. Structure and Interpretation of Computer Programs. 2nd. Cambridge, MA: MIT Press, 1996. isbn: 978-0262510875. [Online Version](https://mitpress.mit.edu/sites/default/files/sicp/index.html).
 
