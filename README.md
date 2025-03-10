@@ -2,7 +2,7 @@
 
 ## Description
 
-This is an implementation of a Metacircular evaluator for Scheme heavily inspired by the evaluator described in Structure and Interpretation of Computer Programs (SICP).
+This is an implementation of a metacircular evaluator for Scheme heavily inspired by the evaluator described in Structure and Interpretation of Computer Programs (SICP).
 
 This repository contains:
 
