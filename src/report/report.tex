@@ -1,0 +1,34 @@
+\documentclass[a4paper, 11pt]{report}
+
+\input{header.tex}
+
+\begin{document}
+
+  %->8-------------------------------------------------8<-%
+  \title{The Metacircular Evaluator}
+  \date{\today \\ \vfill Rio de Janeiro - RJ}
+  \author{João Victor Lopez Pereira}
+  \maketitle \newpage
+  \begin{abstract}
+
+    This document provides a comprehensive explanation of a metacircular evaluator implemented for \var{Scheme}. Developing a metacircular evaluator is a fundamental step toward mastering the creation of domain-specific languages.
+
+    The implementation, detailed in the \var{metacircular-evaluator.scm} file, closely follows the evaluator described in \textit{Structure and Interpretation of Computer Programs}\cite{sicp}. It incorporates several enhancements and simplifications to improve both clarity and functionality.
+
+    Additionally, the discussion in Section \ref{section: Lisp as a Fixed Point} draws significant inspiration from the lecture "Metacircular Evaluator"\cite{metacircular-lecture}, delivered by Professor Gerald Jay Sussman at MIT.
+
+    For a deeper understanding, it is strongly recommended to carefully read both the accompanying quotes and the text.
+  \end{abstract}
+  \tableofcontents \newpage
+  %->8-------------------------------------------------8<-%
+
+  \input{document}
+
+  %->8-------------------------------------------------8<-%
+  \newpage
+  \nocite{*}
+  \printbibliography
+  \addcontentsline{toc}{chapter}{Bibliography}
+  %->8-------------------------------------------------8<-%
+
+\end{document}

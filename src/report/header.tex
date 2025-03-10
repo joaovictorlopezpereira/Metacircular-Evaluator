@@ -1,0 +1,96 @@
+%->8---------------Language-and-Document-Packages---------------8<-%
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+%->8------------------------------------------------------------8<-%
+
+%->8--------Referencing-and-Figures-Packages-and-Commands-------8<-%
+\usepackage{tocloft}
+\usepackage{hyperref}
+\usepackage{csquotes}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[backend=biber]{biblatex}
+\addbibresource{repertoire.bib}
+\graphicspath{{figures/}}
+%->8------------------------------------------------------------8<-%
+
+%->8----------Formatting-Related-Packages-and-Commands----------8<-%
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm, cancel}
+\usepackage{upquote}
+\usepackage{indentfirst}
+\usepackage{listings}
+\usepackage{xcolor}
+\setlength{\parskip}{\baselineskip}
+\setlength{\footnotesep}{0.8em}
+\setlength{\skip\footins}{2em}
+\setlength{\cftbeforechapskip}{12pt}
+\setlength{\cftbeforesecskip}{6pt}
+%->8------------------------------------------------------------8<-%
+
+%->8---------------------Math-Related-Macros--------------------8<-%
+\newtheorem{theorem}{Teorema}[section]
+\newcommand{\demonstracao}{\noindent\textbf{Demonstração: }}
+\newcommand{\corolario}{\noindent\textbf{Corolário: }}
+\renewcommand{\qed}{\hfill\square}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
+\newcommand{\dotprod}[1]{\left\langle#1\right\rangle}
+\newcommand{\proj}[2]{\text{proj}_{#1}(#2)}
+\renewcommand{\min}[1]{\text{Min}_{#1}\,\,}
+\newcommand{\argmin}[1]{\text{Argmin}_{#1}\,\,}
+\newcommand{\argmax}[1]{\text{Argmin}_{#1}\,\,}
+\newcommand{\mul}{\cdot}
+\newcommand{\grad}{\nabla}
+\renewcommand{\deg}{\ensuremath{^\circ}}
+% \renewcommand{\sin}{\text{sen}}
+\newenvironment{jmatrix}{\begin{bmatrix}}{\end{bmatrix}}
+%->8------------------------------------------------------------8<-%
+
+%->8---------------------Code-Related-Macros--------------------8<-%
+\lstnewenvironment{code}[1][]{
+  \lstset{
+    basicstyle=\ttfamily,
+    columns=flexible,
+    breaklines=true,
+    breakatwhitespace=true,
+    frame=none,
+    basewidth=0.5em,
+    aboveskip=13pt,
+    belowskip=0pt,
+    #1
+  }
+}{}
+\lstnewenvironment{styledoutput}[1][]{
+  \lstset{
+    basicstyle=\ttfamily\itshape,
+    breaklines=true,
+    breakatwhitespace=true,
+    frame=none,
+    aboveskip=0pt,
+    #1
+  }
+}{}
+\newcommand{\userinput}[1]{\noindent\texttt{\textit{>}}\texttt{#1}}
+\newcommand{\useroutput}[1]{\textit{\texttt{#1}}}
+\newcommand{\var}[1]{\texttt{#1}}
+%->8------------------------------------------------------------8<-%
+
+%->8------------------Formatting-Related-Macros-----------------8<-%
+\newcommand{\excerpt}[4]{ %{phrase}{author}{font}{cite}
+  \vspace{25pt}
+  \begin{quote}
+    \begin{center}
+      \hfill
+      \begin{minipage}{0.65\textwidth}
+        #1 #4 \\[10pt] #2, \\ \textit{#3}
+      \end{minipage}
+    \end{center}
+  \end{quote}
+  \vspace{25pt}
+}
+\newcommand{\excerptinfn}[4]{\textit{``#1''} #2, \textit{#3}#4}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{Todo:} #1}}
+\newcommand{\nonport}[1]{\textit{#1}}
+%->8------------------------------------------------------------8<-%

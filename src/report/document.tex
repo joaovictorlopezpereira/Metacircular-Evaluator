@@ -1,0 +1,398 @@
+%->8-------------------------------------------------8<-%
+
+\chapter{The Evaluator}
+
+\section{Motivation}
+\label{section: Motivation}
+
+  \excerpt{[...] It's in words that the magic is --- Abracadabra, Open Sesame, and the rest --- but the magic words in one story aren't magical in the next. The real magic is to understand which words work, and when, and for what; the trick is to learn the trick. [...] And those words are made from the letters of our alphabet: a couple-dozen squiggles we can draw with the pen. This is the key! And the treasure, too, if we can only get our hands on it! It's as if --- as if the key to the treasure is the treasure!}{John Barth}{Chimera}{\cite{barth-1972-chimera}}
+
+  A programmer may want to use different programming languages according to his desired-program needs. In programming a scheduler --- for example --- one may want to use a considerably amount of pointers and access to low-level instructions. In programming a machine learning algorithm, for instance, the same programmer may want to use a language that allows a huge load of abstraction, since it is not of his desire to be worried about memory or small details. By the same argument, the definition of low-level is arguable. According to Alan Jay Perlis, ``A programming language is low level when its programs require attention to the irrelevant.\cite{epigrams-alan}''.
+
+  The point is that a language that is designed for a certain purpose is generally more appropriate for solving a certain issue. \var{Singular}, for example, may be a spectacular language for Computer Algebra, but may not be appropriate for simply plotting a sin function. \var{Python}, on the other hand, can be used to plot a sin function in no more than 3 lines of code, but is not the best for Computer Algebra. By the same argument, this document was made in \var{LaTeX} instead of \var{C} or some other general purpose language.
+
+  In conclusion, domain-specific languages prove to be particularly effective in scenarios where specialized tasks cannot be efficiently addressed by general-purpose languages. To allow a programer to develop its own language to address a program is to allow the creation of an instrument capable of shaping the complexity of the problem to the specific needs of the domain.
+
+\section{The Evaluator as a Program}
+\label{section: The Evaluator as a Program}
+
+  \excerpt{It is no exaggeration to regard this as the most fundamental idea in programming: The evaluator, which determines the meaning of expressions in a programming language, is just another program. To appreciate this point is to change our images of ourselves as programmers. We come to see ourselves as designers of languages, rather than only users of languages designed by others. In fact, we can regard almost any program as the evaluator for some language.}{Gerald Jay Sussman \& Harold Abelson}{Structure and Interpretation of Computer Programs}{\cite{sicp}}
+
+  By implementing an interpreter for solving a specific problem, the developer is allowed to make decisions about the semantics and syntax of \emph{his} programming language.
+
+  Note that most --- maybe all --- of the programs that are written can be easily seen as a tiny extension of a existing programming language. For example, imagine the following \var{factorial} procedure:
+
+  \noindent
+  \begin{minipage}[t]{0.37\textwidth}
+    In \var{Scheme}:
+    \begin{code}
+(define (factorial n)
+  (if (<= n 1)
+      n
+      (* n
+         (factorial (- n
+                       1)))))
+    \end{code}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.29\textwidth}
+    In \var{Python}:
+    \begin{code}
+def factorial(n):
+  if n <= 1:
+    return n
+  else:
+    return n * factorial(n-1)
+    \end{code}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.32\textwidth}
+    In \var{C}:
+    \begin{code}
+int factorial(int n) {
+  if (n <= 1) {
+    return n;
+  }
+  else {
+    return n * factorial(n-1);
+  }
+}
+    \end{code}
+  \end{minipage}
+
+  The \var{factorial} program defined above is in fact a tiny programming language with its own semantics and syntax. All the three versions of \var{factorial} have the same semantics, they compute the factorial of a given number following the same mathematical definition. On the other hand, the three of them have different syntax. Note that the \var{Scheme} implementation require a lot of parentheses and the \var{C} implementation require some parentheses, curly brackets and semicolons. while the \var{Python} implementation relies mostly of its syntax on the indentation\footnote{Note that in \var{C} and \var{Scheme}, indentation is only used for better visualization and understanding of the definitions. However, these are not required.}.
+
+  The \var{factorial} procedure is a simple program considering that it has a very strict input and a very strict output, exactly like a mathematical function $f : \mathbb{N} \to \mathbb{N}$ such that:
+
+  \begin{center}
+   $\begin{cases}
+      f(n) = n & \text{if } n \leq 1 \\ \\
+      f(n) = n \times f(n-1) & \text{if } n > 1
+    \end{cases}$
+  \end{center}
+
+  The interpreter, on the other hand, will have far more expressiveness than the \var{factorial} procedure. In fact, the \var{factorial} procedure will be able to be passed as an argument to the interpreter, in what is known as a universal machine. This flexibility highlights the core concept of computation: the ability to evaluate any function, define new functions, and even create new languages and paradigms for computation. The interpreter serves as the bridge between the abstract, high-level description of a program and its execution on a physical machine.
+
+  The role of the interpreter becomes clear when it is considered that it can evaluate any expression or program written in a language. In a sense, an interpreter for a language is itself a program that reads another program, interprets its meaning, and produces an output. Thus, the interpreter is both a tool for executing programs and a means of creating new languages.
+
+  This perspective encourages us to view programming not just as writing instructions for a computer but as the creation of languages through which computations are described. By designing and implementing interpreters, we become language designers, defining the syntax and semantics that govern the execution of our programs. The ability to define new languages is powerful, enabling the creation of more expressive, efficient, or domain-specific solutions.
+
+  All these programming languages have different ways of parsing through the user's definitions and transcribing them to machine code language (if the language is compiled) or evaluating them (if the language is interpreted). Note that \var{Scheme}, despite having the most unusual syntax of the three languages shown above for the average programmer, actually makes parsing significantly easier for several reasons:
+
+  \begin{enumerate}
+    \item Homoiconicity: the fact that \var{Scheme} code is in fact a huge \var{Scheme} list makes it easier to manipulate its values.
+
+    For an average program --- such as the \var{factorial} function or a scheduler --- the manipulated data typically consists of numbers, characters, arrays and user-defined types. However, in programs like interpreters or compilers, the data being manipulated is code itself. Notice that \var{Scheme} code is itself a \var{Scheme} list. Manipulating this list (which is, in fact, code) isn't much different from manipulating other lists.
+
+    See, for example, a variation of the symbolic differentiation procedure made by Gerald Jay Sussman and Harold Abelson in Structure and Interpretation of Computer Programs\cite{sicp}:
+
+    \begin{code}
+(define (deriv exp var)
+  (cond ((constant? exp var)   0)
+        ((same-var? exp var)   1)
+        ((sum? exp)            (sum-rule      exp var))
+        ((sub? exp)            (sub-rule      exp var))
+        ((product? exp)        (product-rule  exp var))
+        ((division? exp)       (quotient-rule exp var))
+        ((exponentiation? exp) (power-rule    exp var))
+        ((composite? exp)      (chain-rule    exp var))
+        ((ln? exp)             (ln-rule       exp var))
+        ((exp? exp)            (expt-rule     exp var))
+        ((sin? exp)            (sin-rule      exp var))
+        ((cos? exp)            (cos-rule      exp var))
+        (else
+          (error "case not found!"))))
+    \end{code}
+
+    The procedure \var{deriv} takes as input an expression \var{exp} and a variable \var{var} with respect to which the expression will be differentiated. The argument \var{exp} is typically a \var{Scheme} list such as \var{(+ (* a (* x x)) (+ (* b x) c))}. If the variables \var{a}, \var{b}, \var{c}, and \var{x} were defined, this expression could be evaluated to yield a numeric result. In this sense, \var{deriv} operates on \var{exp} in a way analogous to how the evaluator processes expressions. Furthermore, both \var{deriv} and the evaluator accept structurally similar arguments. The procedures \var{deriv} and \var{eval} (the procedure responsible for evaluating expressions) both manipulate lists in a very similar way. Since \var{Scheme} code is itself a \var{Scheme} list, it is extremely simple for \var{eval} to interpret and manipulate expressions directly, as the problem can be reduced to simply manipulating \var{Scheme} lists (which, in fact, are not \emph{any} different from \var{Scheme} code). %This seamless integration between code and data allows procedures like \var{eval} and \var{deriv} to easily traverse, analyze, and transform expressions without the need for additional parsing or conversion steps. This property not only simplifies the implementation of such procedures but also highlights the elegance and power of \var{Scheme}'s design.
+
+    \item S-expressions: In \var{Scheme}, all function calls have the function as the first argument of the expression.
+
+    For most non-lisp users, \var{Scheme} code can be seen as pretty strange, ``why does one prefer to write \var{(+ 1 2)} instead of \var{(1 + 2)}?''.
+
+    A convenience of having \var{+} as the first argument of the expression is to facilitate the parsing. This makes it very easily to apply a function to its arguments. In most cases, all the \var{Scheme} evaluator does is apply the first element of the list (the function) to the remaining evaluated elements of the list (the arguments). This is, in fact, the eval-apply cycle that will be better discussed in section \ref{section: Implementation}.
+  \end{enumerate}
+
+  Try to imagine how are these following codes parsed in their respective languages:
+
+  \noindent
+  \begin{minipage}[t]{0.34\textwidth}
+    In \var{Scheme}:
+    \begin{code}
+(define x 1)
+(- (+ 2
+      (* x
+         (/ 10
+            2)))
+   3)
+    \end{code}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.32\textwidth}
+    In \var{Python}:
+    \begin{code}
+x = 1
+2 + x * 10 / 2 - 3
+    \end{code}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.32\textwidth}
+    In \var{C}:
+    \begin{code}
+int main() {
+  int x = 1;
+  2 + x * 10 / 2 - 3;
+  return 0;
+}
+    \end{code}
+  \end{minipage}
+
+  Most programmers struggle to form an intuitive understanding or make good guesses about how \var{C} or \var{Python} code is parsed. ``How is the order of operations determined? How are the operations precedence implemented? How exactly does the parser work?''.
+
+  In contrast, the \var{Scheme} version of the code is remarkably simple and intuitive.
+
+  \var{Scheme} code doesn't need to be heavily parsed and manipulated in order for it to be evaluated. \var{Scheme} code undergoes minimal parsing, allowing for straightforward traversal, interpretation, and transformation of expressions without the need for complex intermediate representations (similar to the \var{deriv} procedure).
+
+  The process of evaluation of the \var{Scheme} code shown above goes as followed:
+
+  \begin{enumerate}
+    \item the special form \var{define} is applied to the arguments \var{x} and \var{1}. What \var{define} does is assign the value of the third element of the list (\var{1}) to the second element of the list (\var{x}).
+    \item The evaluation of \var{'(- (+ 2 (* x (/ 10 2))) 3)} involves applying the procedure \var{-} to the results of evaluating \var{'(+ 2 (* x (/ 10 2)))} and \var{'3}. The evaluation of \var{'(+ 2 (* x (/ 10 2)))} is done by applying the procedure \var{+} to the results of evaluating \var{'2} and \var{'(* x (/ 10 2))}. The evaluation of \var{'(* x (/ 10 2))} applies the procedure \var{*} to the evaluation of \var{'x} and \var{'(/ 10 2)}. The evaluation of \var{'x} yields the number \var{1}, while the evaluation of \var{'(/ 10 2)} applies the function \var{/} to the evaluation of \var{'10} and \var{'2}. As expected, the evaluations of \var{'3}, \var{'2}, \var{'10}, and \var{'2} are simply the values themselves.
+  \end{enumerate}
+
+  It is easily imaginable that the \var{Scheme} interpreter does something similar to\footnote{This eval-apply cycle expansion is somewhat similar to what the interpreter defined in the \var{metacircular \- -evaluator.scm} file does. However, observe that the second argument of \var{apply} should have been a list since \var{eval} invokes \var{apply} with the second argument begin a map of \var{eval} throughout the arguments of the function passed to \var{apply}.}:
+
+  \begin{code}
+(eval '(define x 1))
+...
+(eval '(- (+ 2 (* x (/ 10 2))) 3))
+(apply (eval '-) (eval '(+ 2 (* x (/ 10 2)))) (eval '3))
+(apply - (apply (eval '+) (eval '2) (eval '(* x (/ 10 2)))) 3)
+(apply - (apply + 2 (apply (eval '*) (eval 'x) (eval '(/ 10 2)))) 3)
+(apply - (apply + 2 (apply * 1 (apply (eval '/) (eval '10) (eval '2)))) 3)
+(apply - (apply + 2 (apply * 1 (apply / 10 2))) 3)
+(apply - (apply + 2 (apply * 1 5)) 3)
+(apply - (apply + 2 5) 3)
+(apply - 7 3)
+4
+  \end{code}
+
+  Questions about how code is evaluated are resolved through an understanding of the eval-apply cycle.
+
+\section{Implementation}
+\label{section: Implementation}
+
+  \excerpt{We're going to understand what we mean by a program a little bit more profoundly than we have up till now. We've been thinking of programs as describing machines. [...] There's something very remarkable that can happen in the computational world which is that you can have something called a universal machine. [...] We'll see that among other things, it's extremely simple. Now, we are getting very close to the real spirit in the computer at this point. [...] There's a certain amount of mysticism that will appear here. [...] I wish to write for you the evaluator for Lisp. The evaluator isn't very complicated, it's very much like all the programs we've seen already: that's the amazing part of it.}{Gerald Jay Sussman}{Lecture 7A: Metacircular Evaluator. Timestamp: 0:18}{\cite{metacircular-lecture}}
+
+  The interpreter for \var{Scheme} is commonly referred to as the \emph{Metacircular} Evaluator. It is called Meta because it is written in the language itself, meaning \var{Scheme} code is interpreting \var{Scheme}. It is called Circular because it --- for the most part --- consists of a recursive loop between the functions \var{eval} and \var{apply} known as the eval-apply cycle.
+
+  The main function of the evaluator is \var{eval} itself, which definition is:
+
+  \begin{code}
+(define (EVAL exp env)
+  (cond
+    ((self-value? exp)  exp)
+    ((variable? exp)    (lookup-variable-value exp env))
+    ((quoted? exp)      (text-of-quotation exp))
+    ((assignment? exp)  (eval-assignment exp env))
+    ((definition? exp)  (eval-definition exp env))
+    ((if? exp)          (eval-if exp env))
+    ((lambda? exp)      (make-procedure (lambda-ps exp) (lambda-body exp) env))
+    ((begin? exp)       (eval-sequence (begin-actions exp) env))
+    ((and? exp)         (eval-and exp env))
+    ((or? exp)          (eval-or exp env))
+    ((cond? exp)        (EVAL (cond->if exp) env))
+    ((let? exp)         (EVAL (let->combination exp) env))
+    ((let*? exp)        (EVAL (let*->nested-lets exp) env))
+    ((application? exp) (APPLY (EVAL (operator exp) env)
+                               (map (lambda (exp) (EVAL exp env))
+                                    (operands exp))))))
+  \end{code}
+
+  Something noticeable is that \var{eval} is simply a case analysis which determines what should be done to the given expression. Notice that there are 3 kinds of procedures on the \var{eval} definition:
+
+  \begin{enumerate}
+    \item Special Forms: These constructs cannot be implemented as simple functions because their evaluation behavior differs from that of regular functions. Take, for example, the \var{if} special form. When evaluating \var{(if x y z)}, it first checks whether \var{x} is true. If it is, \var{y} is evaluated and returned; otherwise, \var{z} is evaluated and returned. The distinction lies in how the expressions \var{y} and \var{z} are handled: if \var{if} were implemented as a regular function, both \var{y} and \var{z} would be evaluated before the function is called, even though only one of them is actually needed. This difference is particularly important when \var{y} or \var{z} involve side effects, as unnecessary evaluations could lead to unintended behavior.
+    \item Derived Expressions: These constructs can easily be implemented as a list manipulation procedure that converts an expression to a special form. Take, for example, the \var{cond} expression. \var{Cond} can easily be implemented as a syntactic-sugar to nested \var{if} expressions. The same happens to \var{let}, which can be implemented as a \var{lambda} expression and \var{let*}, which can be implemented as nested \var{let} expressions.
+    \item Applications: These constructs are the remaining building blocks in the evaluation process. In an application, a function is applied to a sequence of arguments. The function is first evaluated to determine its value (a procedure), and then its arguments are evaluated. The procedure is then invoked with the results of the arguments' evaluations. This process forms the backbone of computation in functional programming, as nearly every computation reduces to applying functions to arguments.
+  \end{enumerate}
+
+  The fact that all expressions start with the function itself makes it extremely easy to implement the checking procedures since they are simply verifying if the first element of the expression is equal to something.
+
+  \begin{code}
+(define (tagged-list? exp tag)
+  (if (pair? exp)
+      (eq? (car exp) tag)
+      false))
+
+(define self-value?              number?)
+(define variable?                symbol?)
+(define (quoted? exp)            (tagged-list? exp 'quote))
+(define (assignment? exp)        (tagged-list? exp 'set!))
+(define (definition? exp)        (tagged-list? exp 'define))
+(define (if? exp)                (tagged-list? exp 'if))
+(define (lambda? exp)            (tagged-list? exp 'lambda))
+(define (begin? exp)             (tagged-list? exp 'begin))
+(define (and? exp)               (tagged-list? exp 'and))
+(define (or? exp)                (tagged-list? exp 'or))
+(define (cond? exp)              (tagged-list? exp 'cond))
+(define (let? exp)               (tagged-list? exp 'let))
+(define (let*? exp)              (tagged-list? exp 'let*))
+(define application?             pair?)
+(define (compound-procedure? p)  (tagged-list? p 'procedure))
+(define (primitive-procedure? p) (tagged-list? p 'primitive))
+  \end{code}
+
+  \var{Apply} is the procedure responsible for searching the procedure in the environment and applying it to the evaluated remaining arguments.
+
+  \begin{code}
+  (define (APPLY procedure arguments)
+    (cond
+      ((primitive-procedure? procedure)
+       (apply-primitive-procedure procedure arguments))
+      ((compound-procedure? procedure)
+       (eval-sequence (procedure-body procedure)
+                      (extend-environment (procedure-parameters procedure)
+                                          arguments
+                                          (procedure-environment procedure))))))
+  \end{code}
+
+  These are the most important definitions that are needed for understanding the evaluator.
+
+  It's definitely uneven to think that a huge program can be evaluated by a program this small\footnote{The program includes more definitions than just \var{eval} and \var{apply} that, for the sake of simplicity and conciseness, will not be included here.}, but that's precisely the elegance of a metacircular evaluator: it leverages the power of the language it interprets to reflect its own semantics, demonstrating that even the most complex systems can be built upon simple, recursive principles.
+
+  If you examine the implementation of the metacircular evaluator in detail, you will notice that many definitions are simply aliases for basic list operations like \var{car} and \var{cdr}. This design choice creates a clear separation between syntax and semantics, making it easier to modify the language's behavior without changing its underlying semantics. For instance, consider the evaluator's final check:
+
+  \begin{code}
+((application? exp) (APPLY (EVAL (operator exp) env)
+                           (map (lambda (exp) (EVAL exp env))
+                                (operands exp))))
+  \end{code}
+
+  Here, the \var{operator} and \var{operands} procedures are defined as followed:
+
+  \begin{code}
+(define operator car)  ; first element of the expression
+
+(define operands cdr)  ; all elements of the expression except for the first one
+  \end{code}
+
+  To modify \var{Scheme} for educational purposes --- such as placing the operator as the second element of the list --- it is possible to simply redefine these procedures:
+  \begin{code}
+(define operator cadr)      ; second element of the expression
+
+(define (operands x)        ; all elements of the expression
+  (cons (car x) (cddr x)))  ; except for the second one
+  \end{code}
+
+  This change would allow expressions like \var{(4 + 2)} and \var{(4 factorial)} to evaluate correctly while preserving the original semantics\footnote{With this modification some strange syntax would appear, like evaluating \var{(2 * 3 5 7)} in order to compute the product of the 4 first prime numbers.}. The ability to adapt the syntax so easily highlights the power and flexibility of this approach.
+
+  Notice the similarities between \var{eval} and \var{deriv}. Both are recursive\footnote{The recursive nature of \var{deriv} may not be immediately evident from its definition. However, consider the sum rule for differentiation, for instance, and the recursive structure of the procedure becomes apparent.} procedures that traverse\footnote{Notice that not all functions within an expression passed to \var{eval} are evaluated. For instance, consider the \var{if} special form.} a \var{Scheme} list and, based on the specific case encountered, invoke an appropriate procedure to operate on the given expression.
+
+\section{Lisp as a Fixed Point}
+\label{section: Lisp as a Fixed Point}
+
+  \excerpt{There's an awful lot of strange nonsense here. After all, he purported to explain to me Lisp, and he wrote me a Lisp program on the blackboard. The Lisp program was intended to be an interpreter for Lisp, but you need a Lisp interpreter in order to understand that program. How could that program have told me anything there is to be known about Lisp? [...] The whole thing is sort of like these Escher's hands.}{Gerald Jay Sussman}{Lecture 7A: Metacicular Evaluator. Timestamp: 56:19}{\cite{metacircular-lecture}}
+
+  Given the set of equations \[\begin{cases} x = 3 - y \\ \\ y = - 1 + x, \end{cases}\] notice that $x$ is defined in terms of $y$ and $y$ is defined in terms of $x$. This system has not only a solution but a unique one in $x$ and $y$.
+
+  Given the set of equations \[\begin{cases} 2x = 6 - 2y \\ \\ y = 3 - x, \end{cases}\] notice that $x$ is once again defined in terms of $y$ and $y$ is defined in terms of $x$. Strangely enough, this system has no solution in $x$ and $y$.
+
+  Given the set of equations \[\begin{cases} x = 1 + y \\ \\ y = x - 2, \end{cases}\] notice that the pattern of recursive definitions once again appears. However, this system has no solutions in $x$ and $y$.
+
+  Given these three sets of equations, note that the number of solutions is not a consequence of their format, but of their content. The equation of interest is the one that has a unique solution.
+
+  \[\begin{cases} x = 3 - y \\ \\ y = - 1 + x. \end{cases}\]
+
+  A way of seeing this set of equations is as a transformation $T$ such that \[\begin{jmatrix} x \\ y \end{jmatrix} = T \begin{jmatrix} x \\ y \end{jmatrix}.\] Note that the solution of this equation is a fixed point of the transformation $T$.
+
+  Take a closer look at the \var{factorial} procedure implemented in section \ref{section: The Evaluator as a Program}. Observe that \var{factorial} is a kind of recursive equation somewhat similar to the set of equations in $x$ and $y$.
+
+  To find the fixed point of \var{factorial}, it is first needed to rewrite it in such a way that the transformation $T$ becomes apparent.
+
+  \begin{code}
+(define (f g)
+  (lambda (n)
+    (if (<= n 1)
+        n
+        (* n (g (- n 1))))))
+  \end{code}
+
+  Observe that \var{f} is a procedure such that, if the solution \var{g} were provided, the result would be the \var{factorial} procedure. Assuming \var{g} is the \var{factorial} procedure, \var{f} would produce precisely the same \var{factorial} procedure described in section \ref{section: The Evaluator as a Program}.
+
+  It's strange that the \var{g} procedure is needed for \var{g} to be the result of this function, by the same way that somehow the value of $x$ is needed to compute $x$ in $x = 4 - x$. As shown in linear algebra, a way to approximate the solution $x$ of this equation in simply by having a start guess $x_0$ and apply the transformation $T$ to $x$ multiple times.
+
+  \begin{align*}
+    x_1 &= T x_0 \\
+    x_2 &= T x_1 \\
+    x_3 &= T x_2 \\
+    \vdots \\
+    x_{k} &= T x_{k-1} \\
+  \end{align*}
+
+  Such that $x_i$, $\forall i \in \{1, \dots, k\}$, is an approximation of $x$. A similar approximation can be made to the factorial procedure:
+
+  \begin{code}
+; computes 0! and 1! with no errors
+(define factorial-0 (lambda (n) 1)) ; initial guess is 0
+
+; computes 2! with no errors
+(define factorial-1 (f factorial-0))
+
+; computes 3! with no errors
+(define factorial-2 (f factorial-1))
+
+; computes 4! with no errors
+(define factorial-3 (f factorial-2))
+  \end{code}
+
+  \var{Factorial-3} is an approximation of \var{factorial} that computes factorials up to $4$ with no errors. It can be concluded that the procedure \var{factorial} is equal to $\lim_{n \to \infty}$ \var{factorial-n}. It can also be said that \var{factorial} is equal to \var{(f (f (...(f factorial-0)...)))} or that \var{factorial} is a fixed-point of the function \var{f}.
+
+  A way of making an infinite loop is by the Curry's Paradoxical Combinator of Y:
+
+  \begin{code}
+Y = (lambda (F)
+      ((lambda (x) (F (x x)))
+       (lambda (x) (F (x x)))))
+  \end{code}
+
+  By applying \var{Y} to \var{F}:
+
+  \begin{code}
+(Y F) = ((lambda (x) (F (x x)))
+         (lambda (x) (F (x x))))
+      = (F ((lambda (x) (F (x x)))
+            (lambda (x) (F (x x)))))
+      = (F (Y F))
+  \end{code}
+
+  We can conclude that \var{(Y F) = (F (Y F))} which is exactly what we wanted (An infinite loop).
+
+  \excerpt{What Lisp is, is the fixed point of the process which says ``If I knew what Lisp was and substituted it in for eval and apply, and so on, on the right hand side of all those recursive equations, [...] Then the left hand side would also be Lisp''.}{Gerald Jay Sussman}{Lecture 7A: Metacircular Evaluator. Timestamp: 1:16:37}{\cite{metacircular-lecture}}
+
+  In the same way that the \var{f} procedure, when given a \var{factorial} procedure, returns \var{factorial}, the procedures \var{eval} can be defined similarly as being the fixed point \var{eval} $= L$ \var{eval}.
+
+  \begin{code}
+(define L
+  (lambda (ev)
+    <...>
+    ((application? exp) (apply (ev (operator exp) env)
+                               (map (lambda (exp) (ev exp env)) (operands exp))))
+    <...>))
+  \end{code}
+
+  By this definition, \var{L} is a procedure that takes \var{ev} as argument and returns an approximation to the \var{eval} procedure defined in section \ref{section: Implementation}. By the same argument used in \var{factorial}, we could say that \var{eval} (or even \var{Scheme}) is equal to $\var{(L (L (...(L ev0)...)))}$, with \var{ev0} being in fact \emph{any} initial guess.
+
+
+
+  \section{Conclusion}
+
+  \excerpt{There are many languages that have made a mess of themselves by adding huge numbers of features. [...] Many systems suffer from what is called ``creeping featurism''. [...] After a while, the thing has a manual 500 pages long that no one can understand. [...] In computer languages, I think it's a disaster to have too much stuff in them.}{Gerald Jay Sussman}{Lecture 7B: Metacircular Evaluator. Timestamp: 2:48}{\cite{language-features}}
+
+  The fact that \var{Scheme} code is inherently represented as lists, with functions appearing as the first element of these lists, makes it exceptionally simple, convenient, and elegant to implement a metacircular evaluator. \var{Scheme}'s minimalistic design, combined with its remarkable abstraction capabilities, allows it to serve as an ideal foundation for creating domain-specific languages.
+
+  Understanding how to implement such an easy evaluator for a language like \var{Scheme}, is the first step towards learning how to create programming languages ourselves.
+
+  \excerpt{Once you have the interpreter in your hands, you have all this power to start playing with the language. [...] There's this notion of metalinguistic abstraction, which says [...] that you can gain control of complexity by inventing new languages, sometimes. One way to think about computer programming is that it only incidentally has to do with getting a computer to do something. Primarily, what a computer program has to do with is a way of expressing ideas, of communicating ideas. Sometimes, when you want to communicate new kinds of ideas, you'd like to invent new modes of expressing them.}{Lecture 8A: Logic Programming. Timestamp: 1:45}{Harold Abelson}{\cite{one-way-to-thing-about-computer-programming}}
+
+%->8-------------------------------------------------8<-%
