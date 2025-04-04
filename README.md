@@ -8,7 +8,7 @@ This repository contains:
 
 - Source Code: The implementation is provided in the ``metacircular-evaluator.scm`` file. It closely follows the evaluator described in Structure and Interpretation of Computer Programs (SICP), with some extensions, including the implementation of ``and``, ``or``, and ``let*`` as special forms.
 
-- Documentation: The ``report.pdf`` file includes a detailed exploration of key concepts related to the evaluator. While it does not serve as an explanation of the code, it introduces and discusses fundamental ideas that motivate the study of the evaluator, as well as insights from Gerald Jay Sussman’s lectures and the SICP textbook.
+- Documentation: The ``report.pdf`` and ``slides.pdf`` files include a detailed exploration of key concepts related to the evaluator. While it does not serve as an explanation of the code, it introduces and discusses fundamental ideas that motivate the study of the evaluator, as well as insights from Gerald Jay Sussman’s lectures and the SICP textbook.
 
 -----
 
