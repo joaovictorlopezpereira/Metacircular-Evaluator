@@ -1,0 +1,31 @@
+
+% It is no exaggeration to regard this as the most fundamental idea in programming: The evaluator, which determines the meaning of expressions in a programming language, is just another program. To appreciate this point is to change our images of ourselves as programmers. We come to see ourselves as designers of languages, rather than only users of languages designed by others. In fact, we can regard almost any program as the evaluator for some language. 6564'514
+@book{sicp,
+  author        = {Abelson, Harold and Sussman, Gerald Jay},
+  title         = {Structure and Interpretation of Computer Programs},
+  publisher     = {The MIT Press},
+  year          = {1984},
+  month         = {7},
+  isbn          = {9780262010771},
+  address       = {Cambridge, Massachusetts}
+}
+
+% We're going to understand what we mean by a program a little bit more profoundly than we have up till now. We've been thinking of programs as describing machines. [...] There's something very remarkable that can happen in the computational world which is that you can have something called a universal machine. [...] We'll see that among other things, it's extremely simple. Now, we are getting very close to the real spirit in the computer at this point. [...] There's a certain amount of mysticism that will appear here. [...] I wish to write for you the evaluator for Lisp. The evaluator isn't very complicated, it's very much like all the programs we've seen already: that's the amazing part of it. Timestamp: 0:18
+% There's an awful lot of strange nonsense here. After all, he purported to explain to me Lisp, and he wrote me a Lisp program on the blackboard. The Lisp program was intended to be an interpreter for Lisp, but you need a Lisp interpreter in order to understand that program. How could that program have told me anything there is to be known about Lisp? Timestamp: 56:19
+% What Lisp is, is the fixed point of the process which says ``If I knew what Lisp was and substituted it in for eval and apply, and so on, on the right hand side of all those recursive equations, [...] Then the left hand side would also be Lisp''. Timestamp: 1:16:37
+@online{sicp-lecture-metacircular-evaluator-part-1,
+  author       = {Gerald Jay Sussman},
+  title        = {Lecture 7A: Metacircular Evaluator, Part 1},
+  url          = {https://youtu.be/aAlR3cezPJg},
+  howpublished = {online},
+  note         = {Accessed on 2024-12-24}
+}
+
+% Once you have the interpreter in your hands, you have all this power to start playing with the language. [...] There's this notion of metalinguistic abstraction, which says [...] that you can gain control of complexity by inventing new languages, sometimes. One way to think about computer programming is that it only incidentally has to do with getting a computer to do something. Primarily, what a computer program has to do with is a way of expressing ideas, of communicating ideas. Sometimes, when you want to communicate new kinds of ideas, you'd like to invent new modes of expressing them. Timestamp: 1:45
+@online{sicp-lecture-logic-programming-part-1,
+  author       = {Harold Abelson},
+  title        = {Lecture 8A: Logic Programming, Part 1},
+  % url          = {https://youtu.be/rCqMiPk1BJE},
+  howpublished = {online},
+  note         = {Accessed on 2024-12-28}
+}

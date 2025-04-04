@@ -1,0 +1,52 @@
+
+\section{Implementação}
+
+\begin{frame}[fragile]
+  \frametitle{O Avaliador}
+  \excerptpage{The evaluator isn't very complicated, it's very much like all the programs we have seen already: that's the amazing part of it.}{Gerald Jay Sussman}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{O Avaliador}
+    \begin{code}
+      (eval 5) -> 5
+    \end{code}
+    \pause
+    \begin{code}
+      (eval (define x 17)) -> "variavel definida"
+    \end{code}
+    \pause
+    \begin{code}
+      (eval x) -> 17
+    \end{code}
+    \pause
+    \begin{code}
+      (eval (if (> 5 3) 1 0)) -> 1
+    \end{code}
+    \pause
+    \begin{code}
+      (eval ((lambda (x) (* x 5)) 7)) -> 35
+    \end{code}
+    \pause
+    \begin{code}
+      (eval (+ 1 2 3)) -> 6
+    \end{code}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{O Avaliador}
+  \begin{code}
+(define (EVAL exp env)
+  (cond
+    ((number? exp)      exp)
+    ((variable? exp)    (lookup-variable-value exp env))
+    ((definition? exp)  (eval-definition exp env))
+    ((if? exp)          (eval-if exp env))
+    ((lambda? exp)      (make-procedure (cadr exp)
+                                        (cddr exp) env))
+    ((application? exp) (apply (EVAL (car exp) env)
+                               (map (lambda (exp)
+                                            (EVAL exp env))
+                                    (cdr exp))))))
+  \end{code}
+\end{frame}

@@ -1,0 +1,42 @@
+
+\section{Lisp}
+
+\begin{frame}
+  \frametitle{Um pouco sobre a linguagem}
+  \begin{itemize}
+    \item Linguagem funcional criada em 1958 para manipulação simbólica de listas; \vspace{1cm}
+    \pause
+    \item Apresenta listas como estrutura de dados fundamental; \vspace{1cm}
+    \pause
+    \item Os códigos da linguagem também são listas. \vspace{1cm}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Exemplo de Código Lisp}
+  \begin{columns}
+    \column{0.55\textwidth}
+    \begin{code}
+    (define x 10)
+    \end{code}
+    \pause
+    \begin{code}
+    (define fib
+      (lambda (n)
+        (if (<= n 2)
+            n
+            (+ (fib (- n 1))
+               (fib (- n 2))))))
+    \end{code}
+    \column{0.55\textwidth}
+    \pause
+    \begin{code}
+(define fact
+  (lambda (x)
+    (if (= x 1)
+        1
+        (* x
+           (fact (- x 1))))))
+    \end{code}
+  \end{columns}
+\end{frame}

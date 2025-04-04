@@ -1,0 +1,56 @@
+
+%->8-------------------------------------------------------------------------------------------8<-%
+\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usetheme{Darmstadt}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{geometry}
+\geometry{left=0.4cm, right=0.4cm}
+\usepackage{csquotes}
+\usepackage{amsmath, amssymb}
+\usepackage{upquote}
+\usepackage{listings}
+\usepackage{hyperref}
+\setbeamertemplate{navigation symbols}{}
+%->8-------------------------------------------------------------------------------------------8<-%
+
+%->8-------------------------------------------------------------------------------------------8<-%
+\usepackage[style=numeric, backend=biber]{biblatex}
+\addbibresource{repertoire.bib}
+\graphicspath{{figures/}}
+%->8-------------------------------------------------------------------------------------------8<-%
+
+%->8-------------------------------------------------------------------------------------------8<-%
+\lstnewenvironment{code}[1][]{
+  \lstset{
+    basicstyle=\ttfamily,
+    columns=flexible,
+    breaklines=true,
+    breakatwhitespace=true,
+    frame=none,
+    basewidth=0.5em,
+    aboveskip=13pt,
+    belowskip=0pt,
+    #1
+  }
+}{}
+
+\newcommand{\excerptpage}[2]{
+  \begin{center}
+    \textit{#1}\\
+        --- #2.
+  \end{center}
+}
+
+\newcommand{\var}[1]{\texttt{#1}}
+%->8-------------------------------------------------------------------------------------------8<-%
+
+%->8-------------------------------------------------------------------------------------------8<-%
+\title{Avaliador Metacircular de Lisp}
+\subtitle{}
+\author{João Victor Lopez Pereira}
+\institute{Instituto de Computação -- UFRJ}
+\date{\today}
+%->8-------------------------------------------------------------------------------------------8<-%
