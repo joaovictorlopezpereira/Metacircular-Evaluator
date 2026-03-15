@@ -4,7 +4,7 @@
 \begin{frame}
   \frametitle{Um pouco sobre a linguagem}
   \begin{itemize}
-    \item Linguagem funcional criada em 1958 para manipulação simbólica de listas; \vspace{1cm}
+    \item Criada em 1958 para manipulação simbólica, baseada no Cálculo Lambda (\emph{Lambda Papers}); \vspace{1cm}
     \pause
     \item Apresenta listas como estrutura de dados fundamental; \vspace{1cm}
     \pause
@@ -23,7 +23,7 @@
     \begin{code}
     (define fib
       (lambda (n)
-        (if (<= n 2)
+        (if (< n 2)
             n
             (+ (fib (- n 1))
                (fib (- n 2))))))
@@ -33,10 +33,12 @@
     \begin{code}
 (define fact
   (lambda (x)
-    (if (= x 1)
+    (if (= x 0)
         1
         (* x
            (fact (- x 1))))))
     \end{code}
   \end{columns}
 \end{frame}
+
+% Maybe add one of this functions as a tree for better visualization

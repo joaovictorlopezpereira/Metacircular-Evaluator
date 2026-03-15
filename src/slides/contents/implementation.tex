@@ -1,6 +1,4 @@
 
-\section{Implementação}
-
 \begin{frame}[fragile]
   \frametitle{O Avaliador}
   \excerptpage{The evaluator isn't very complicated, it's very much like all the programs we have seen already: that's the amazing part of it.}{Gerald Jay Sussman}
@@ -36,7 +34,7 @@
 \begin{frame}[fragile]
   \frametitle{O Avaliador}
   \begin{code}
-(define (EVAL exp env)
+(define (eval exp env)
   (cond
     ((number? exp)      exp)
     ((variable? exp)    (lookup-variable-value exp env))
@@ -44,9 +42,9 @@
     ((if? exp)          (eval-if exp env))
     ((lambda? exp)      (make-procedure (cadr exp)
                                         (cddr exp) env))
-    ((application? exp) (apply (EVAL (car exp) env)
-                               (map (lambda (exp)
-                                            (EVAL exp env))
+    ((application? exp) (apply (eval (car exp) env)
+                               (map (lambda (arg)
+                                            (eval arg env))
                                     (cdr exp))))))
   \end{code}
 \end{frame}

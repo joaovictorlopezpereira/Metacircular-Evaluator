@@ -8,9 +8,12 @@
 
 \begin{frame}
   \frametitle{Convergência a Depender do Conteúdo}
-  \[\begin{cases}
-    x = 3 - y \\ \\ y = -1 + x
-  \end{cases}\]
+  \[
+    \begin{cases}
+      x = 3 - y \\
+      y = -1 + x
+    \end{cases}
+  \]
 
   \vspace{1cm}
 
@@ -19,13 +22,30 @@
 
 \begin{frame}
   \frametitle{Convergência a Depender do Conteúdo}
-  \[\begin{cases}
-    2x = 6 - 2y \\ \\ y = 3 - x
-  \end{cases}\]
+  \[
+    \begin{cases}
+      2x = 6 - 2y \\
+      y = 4 - x
+    \end{cases}
+  \]
 
   \vspace{1cm}
 
   Nenhuma solução em $x$ e $y$.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Convergência a Depender do Conteúdo}
+  \[
+    \begin{cases}
+      2x = 6 - 2y \\
+      y = 3 - x
+    \end{cases}
+  \]
+
+  \vspace{1cm}
+
+  Infinitas soluções em $x$ e $y$.
 \end{frame}
 
 \begin{frame}
@@ -47,7 +67,7 @@
   \begin{code}
   (define fact
     (lambda (x)
-      (if (= x 1)
+      (if (= x 0)
           1
           (* x (fact (- x 1))))))
   \end{code}
@@ -56,12 +76,12 @@
 \begin{frame}[fragile]
   \frametitle{Fact como Ponto Fixo}
   \begin{code}
-  (define t
-    (lambda (f)
-      (lambda (n)
-        (if (<= n 2)
-            n
-            (* n (f (- n 1)))))))
+(define t
+  (lambda (f)
+    (lambda (n)
+      (if (= n 0)
+          1
+          (* n (f (- n 1)))))))
   \end{code}
 \end{frame}
 
@@ -77,13 +97,13 @@
 
   \pause
 
-  \[\var{factorial} = \lim_{k \to \infty} \var{t}^k \var{fact-0}\]
+  \[\var{fact} = \lim_{k \to \infty} \var{t}^k \var{fact-0}\]
 \end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Eval como Ponto Fixo}
   \begin{code}
-(define (EVAL exp env)
+(define (eval exp env)
   (cond
     ((number? exp)      exp)
     ((variable? exp)    (lookup-variable-value exp env))
@@ -91,9 +111,9 @@
     ((if? exp)          (eval-if exp env))
     ((lambda? exp)      (make-procedure (cadr exp)
                                         (cddr exp) env))
-    ((application? exp) (apply (EVAL (car exp) env)
-                               (map (lambda (exp)
-                                            (EVAL exp env))
+    ((application? exp) (apply (eval (car exp) env)
+                               (map (lambda (arg)
+                                            (eval arg env))
                                     (cdr exp))))))
   \end{code}
 \end{frame}
@@ -110,8 +130,8 @@
     ((lambda? exp)      (make-procedure (cadr exp)
                                         (cddr exp) env))
     ((application? exp) (apply (ev (car exp) env)
-                               (map (lambda (exp)
-                                            (ev exp env))
+                               (map (lambda (arg)
+                                            (ev arg env))
                                     (cdr exp))))))))
   \end{code}
 \end{frame}
@@ -119,7 +139,7 @@
 \begin{frame}[fragile]
   \frametitle{Eval como Ponto Fixo}
   \begin{code}
-  (define eval-0 (lambda (n) 1))
+  (define eval-0 (lambda (exp env) 1))
   (define eval-1 (t (eval-0)))
   (define eval-2 (t (eval-1)))
   (define eval-3 (t (eval-2)))

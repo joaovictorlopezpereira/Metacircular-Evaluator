@@ -1,22 +1,22 @@
 
 \begin{frame}[fragile]
-  \frametitle{Facilidade de Manipulação}
+  \frametitle{Manipulação de Estruturas de Dados}
   É fácil manipular estruturas de dados! (pois todas as estruturas são listas!)
   \vspace{0.5cm}
   \pause
   \begin{code}
   (define map
-    (lambda (l f)
-      (if (null? l)
+    (lambda (f lst)
+      (if (null? lst)
           '()
-          (cons (f (car l))
-                (map (cdr l) f)))))
+          (cons (f (car lst))
+                (map f (cdr lst))))))
   \end{code}
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Facilidade de Manipulação}
-  Mas o próprio código de Lisp é formado por listas...
+  \frametitle{Código como Dado}
+  Mas o próprio código de Lisp é estruturado puramente em listas...
   \vspace{1cm} \pause
 
   Isso significa que é fácil manipular código Lisp?
